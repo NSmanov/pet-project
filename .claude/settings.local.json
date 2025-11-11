@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn:*)",
+      "Bash(psql:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(PGPASSWORD=12345 psql:*)",
+      "Bash(java -jar target/task-management-1.0.0-SNAPSHOT.jar:*)",
+      "Bash(curl:*)",
+      "Bash(python3:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
