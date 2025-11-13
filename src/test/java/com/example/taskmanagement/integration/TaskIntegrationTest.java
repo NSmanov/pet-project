@@ -246,4 +246,103 @@ class TaskIntegrationTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data").isNumber());
     }
+
+    @Test
+    @DisplayName("Should filter tasks by status correctly")
+    void shouldFilterTasksByStatusCorrectly() throws Exception {
+        // Create three tasks (all will be TODO by default)
+        CreateTaskRequest task1 = CreateTaskRequest.builder()
+                .title("TODO Task for Filter Test")
+                .description("This should stay in TODO status")
+                .priority(TaskPriority.MEDIUM)
+                .build();
+
+        CreateTaskRequest task2 = CreateTaskRequest.builder()
+                .title("In Progress Task for Filter Test")
+                .description("This will be changed to IN_PROGRESS")
+                .priority(TaskPriority.HIGH)
+                .build();
+
+        CreateTaskRequest task3 = CreateTaskRequest.builder()
+                .title("Done Task for Filter Test")
+                .description("This will be changed to DONE")
+                .priority(TaskPriority.LOW)
+                .build();
+
+        // Create all three tasks and get their IDs
+        String response1 = mockMvc.perform(post("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(task1)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        Long todoTaskId = objectMapper.readTree(response1).get("data").get("id").asLong();
+
+        String response2 = mockMvc.perform(post("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(task2)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        Long inProgressTaskId = objectMapper.readTree(response2).get("data").get("id").asLong();
+
+        String response3 = mockMvc.perform(post("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(task3)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        Long doneTaskId = objectMapper.readTree(response3).get("data").get("id").asLong();
+
+        // Update task2 to IN_PROGRESS
+        UpdateTaskRequest updateToInProgress = UpdateTaskRequest.builder()
+                .status(TaskStatus.IN_PROGRESS)
+                .build();
+        mockMvc.perform(put("/api/tasks/{id}", inProgressTaskId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateToInProgress)))
+                .andExpect(status().isOk());
+
+        // Update task3 to DONE
+        UpdateTaskRequest updateToDone = UpdateTaskRequest.builder()
+                .status(TaskStatus.DONE)
+                .build();
+        mockMvc.perform(put("/api/tasks/{id}", doneTaskId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateToDone)))
+                .andExpect(status().isOk());
+
+        // Filter by TODO status - should find task1
+        mockMvc.perform(get("/api/tasks")
+                        .param("status", "TODO")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data[?(@.title == 'TODO Task for Filter Test')].status").value(hasItem("TODO")));
+
+        // Filter by IN_PROGRESS status - should find task2
+        mockMvc.perform(get("/api/tasks")
+                        .param("status", "IN_PROGRESS")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data[?(@.title == 'In Progress Task for Filter Test')].status").value(hasItem("IN_PROGRESS")));
+
+        // Filter by DONE status - should find task3
+        mockMvc.perform(get("/api/tasks")
+                        .param("status", "DONE")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data[?(@.title == 'Done Task for Filter Test')].status").value(hasItem("DONE")));
+    }
 }
