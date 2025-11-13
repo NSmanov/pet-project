@@ -10,6 +10,9 @@ on:
       - main
       - develop
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     name: Build and Run Tests
@@ -46,6 +49,24 @@ jobs:
       - name: Package application
         run: mvn package -DskipTests -B
 
+      - name: Generate Allure Report
+        if: always()
+        run: mvn allure:report
+
+      - name: Upload Allure Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: target/site/allure-maven-plugin/
+
+      - name: Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: target/allure-results/
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -53,20 +74,16 @@ jobs:
           name: test-results
           path: target/surefire-reports/
 
-      - name: Upload coverage reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-reports
-          path: target/site/
-
       - name: Display test summary
         if: always()
         run: |
           echo "### Test Results Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ -d "target/surefire-reports" ]; then
-            echo "Tests completed. Check artifacts for detailed reports." >> $GITHUB_STEP_SUMMARY
+            echo "✅ Tests completed. Check artifacts for detailed reports." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📊 **Allure Report**: Download 'allure-report' artifact" >> $GITHUB_STEP_SUMMARY
+            echo "📁 **Test Results**: Download 'test-results' artifact" >> $GITHUB_STEP_SUMMARY
           else
             echo "No test reports found." >> $GITHUB_STEP_SUMMARY
           fi
