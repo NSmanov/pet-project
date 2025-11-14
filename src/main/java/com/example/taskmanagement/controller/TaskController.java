@@ -103,4 +103,12 @@ public class TaskController {
         long count = taskService.getTaskCountByStatus(status);
         return ResponseEntity.ok(ApiResponse.success(count));
     }
+
+    @GetMapping("/priority/{priority}")
+    public ResponseEntity<ApiResponse<List<TaskDto>>> getTasksByPriority(@PathVariable String priority) {
+        log.info("GET /api/tasks/priority/{} - Fetching tasks by priority", priority);
+        // FIXME: Метод getTasksByPriority() еще не реализован в сервисе!
+        List<TaskDto> tasks = taskService.getTasksByPriority(priority);
+        return ResponseEntity.ok(ApiResponse.success(tasks));
+    }
 }
