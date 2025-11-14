@@ -35,4 +35,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @Query("SELECT COUNT(t) FROM Task t WHERE t.status = :status AND t.deleted = false")
     long countByStatus(@Param("status") TaskStatus status);
+
+    @Query("SELECT t FROM Task t WHERE t.priority = :priority AND t.deleted = false")
+    List<Task> findByPriority(@Param("priority") com.example.taskmanagement.entity.TaskPriority priority);
 }
