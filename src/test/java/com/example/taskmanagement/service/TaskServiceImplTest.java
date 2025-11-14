@@ -47,6 +47,7 @@ class TaskServiceImplTest {
     void setUp() {
         testTask = Task.builder()
                 .id(1L)
+                .taskCode("TASK-1")
                 .title("Test Task")
                 .description("Test Description")
                 .status(TaskStatus.TODO)
@@ -95,8 +96,8 @@ class TaskServiceImplTest {
             Allure.addAttachment("Статус по умолчанию", result.getStatus().toString());
         });
 
-        Allure.step("Проверка, что repository.save() был вызван ровно 1 раз", () -> {
-            verify(taskRepository, times(1)).save(any(Task.class));
+        Allure.step("Проверка, что repository.save() был вызван 2 раза (для получения ID и установки taskCode)", () -> {
+            verify(taskRepository, times(2)).save(any(Task.class));
         });
     }
 
@@ -160,6 +161,7 @@ class TaskServiceImplTest {
         Task task2 = Allure.step("Подготовка второй тестовой задачи", () ->
             Task.builder()
                     .id(2L)
+                    .taskCode("TASK-2")
                     .title("Task 2")
                     .status(TaskStatus.IN_PROGRESS)
                     .priority(TaskPriority.LOW)
