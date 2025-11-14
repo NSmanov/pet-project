@@ -44,6 +44,7 @@ class TaskServiceImplTest {
     void setUp() {
         testTask = Task.builder()
                 .id(1L)
+                .taskCode("TASK-1")
                 .title("Test Task")
                 .description("Test Description")
                 .status(TaskStatus.TODO)
@@ -79,7 +80,7 @@ class TaskServiceImplTest {
         assertThat(result.getId()).isEqualTo(testTask.getId());
         assertThat(result.getTitle()).isEqualTo(testTask.getTitle());
         assertThat(result.getStatus()).isEqualTo(TaskStatus.TODO);
-        verify(taskRepository, times(1)).save(any(Task.class));
+        verify(taskRepository, times(2)).save(any(Task.class)); // Called twice: once to get ID, once to set taskCode
     }
 
     @Test
@@ -117,6 +118,7 @@ class TaskServiceImplTest {
         // Arrange
         Task task2 = Task.builder()
                 .id(2L)
+                .taskCode("TASK-2")
                 .title("Task 2")
                 .status(TaskStatus.IN_PROGRESS)
                 .priority(TaskPriority.LOW)

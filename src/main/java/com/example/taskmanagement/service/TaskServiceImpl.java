@@ -38,7 +38,13 @@ public class TaskServiceImpl implements TaskService {
                 .build();
 
         Task savedTask = taskRepository.save(task);
-        log.info("Task created successfully with id: {}", savedTask.getId());
+
+        // Generate task code after getting ID
+        String taskCode = "TASK-" + savedTask.getId();
+        savedTask.setTaskCode(taskCode);
+        savedTask = taskRepository.save(savedTask);
+
+        log.info("Task created successfully with id: {} and code: {}", savedTask.getId(), taskCode);
 
         return mapToDto(savedTask);
     }
@@ -148,6 +154,7 @@ public class TaskServiceImpl implements TaskService {
     private TaskDto mapToDto(Task task) {
         return TaskDto.builder()
                 .id(task.getId())
+                .taskCode(task.getTaskCode())
                 .title(task.getTitle())
                 .description(task.getDescription())
                 .status(task.getStatus())
