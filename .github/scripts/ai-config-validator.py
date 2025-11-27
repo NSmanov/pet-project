@@ -98,8 +98,8 @@ class AIConfigValidator:
                 if "name" not in workflow:
                     self.warnings.append(f"{workflow_file.name}: No workflow name defined")
 
-                if "on" not in workflow:
-                    self.errors.append(f"{workflow_file.name}: No trigger events defined")
+                # Note: 'on' check skipped - YAML parses 'on:' as True in Python
+                # Trigger events are validated by GitHub Actions itself
 
                 # Check for permissions
                 if "permissions" in workflow:
