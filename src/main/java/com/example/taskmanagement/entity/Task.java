@@ -22,6 +22,9 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "task_code", unique = true, length = 50)
+    private String taskCode;
+
     @Column(nullable = false, length = 200)
     private String title;
 
