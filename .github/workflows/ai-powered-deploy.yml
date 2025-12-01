@@ -144,6 +144,8 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Container Registry
+        # Only login when pushing (not on PRs)
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.DOCKER_REGISTRY }}
@@ -166,13 +168,16 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.production
-          push: true
+          # Only push on main/develop branches, not on PRs
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Run security scan
+        # Only scan pushed images (not on PRs)
+        if: github.event_name != 'pull_request'
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
@@ -181,6 +186,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload scan results
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: security-scan-results
