@@ -159,8 +159,8 @@ jobs:
           images: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
-            type=sha,prefix={{branch}}-
-            type=semver,pattern={{version}}
+            type=ref,event=pr
+            type=sha
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
@@ -170,7 +170,8 @@ jobs:
           file: ./Dockerfile.production
           # Only push on main/develop branches, not on PRs
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          # Use tags only when pushing, otherwise just build
+          tags: ${{ github.event_name != 'pull_request' && steps.meta.outputs.tags || format('ghcr.io/{0}:pr-{1}', github.repository, github.event.pull_request.number) }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
