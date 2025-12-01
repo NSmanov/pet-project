@@ -24,6 +24,13 @@ spring:
     locations: classpath:db/migration
     schemas: public
 
+  # Static resources configuration for serving frontend
+  web:
+    resources:
+      static-locations: file:/app/static/,classpath:/static/,classpath:/public/
+      cache:
+        period: 3600
+
 logging:
   level:
     com.example.taskmanagement: INFO
@@ -33,3 +40,21 @@ logging:
 
 server:
   port: ${SERVER_PORT:8080}
+
+# Actuator configuration for health checks and monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
