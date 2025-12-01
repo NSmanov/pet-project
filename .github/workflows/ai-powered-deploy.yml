@@ -170,8 +170,8 @@ jobs:
           file: ./Dockerfile.production
           # Only push on main/develop branches, not on PRs
           push: ${{ github.event_name != 'pull_request' }}
-          # Use tags only when pushing, otherwise just build
-          tags: ${{ github.event_name != 'pull_request' && steps.meta.outputs.tags || format('ghcr.io/{0}:pr-{1}', github.repository, github.event.pull_request.number) }}
+          # Use tags only when pushing, otherwise just build (lowercase for Docker compliance)
+          tags: ${{ github.event_name != 'pull_request' && steps.meta.outputs.tags || format('ghcr.io/{0}:pr-{1}', toLower(github.repository), github.event.pull_request.number) }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
