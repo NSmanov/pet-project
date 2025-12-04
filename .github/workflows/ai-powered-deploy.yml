@@ -217,8 +217,9 @@ jobs:
           echo "🚀 Deploying to staging via Coolify..."
           echo "⏱️ Deployment start: $(date)"
 
-          # Trigger Coolify deployment via webhook
+          # Trigger Coolify deployment via webhook with API token
           RESPONSE=$(curl -X GET "${{ secrets.COOLIFY_WEBHOOK_URL }}" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
             -w "\n%{http_code}" \
             -s)
 
