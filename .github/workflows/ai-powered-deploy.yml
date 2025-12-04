@@ -160,7 +160,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.DOCKER_REGISTRY }}/${{ steps.repo.outputs.name }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -185,7 +185,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          image-ref: ${{ env.DOCKER_REGISTRY }}/${{ steps.repo.outputs.name }}:${{ github.sha }}
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
@@ -205,40 +205,51 @@ jobs:
     if: github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch'
     environment:
       name: staging
-      url: https://staging.yourapp.com
+      url: http://104.248.141.66:8080
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to staging
+      - name: Trigger Coolify deployment
         run: |
-          echo "🚀 Deploying to staging environment..."
+          echo "🚀 Deploying to staging via Coolify..."
           echo "⏱️ Deployment start: $(date)"
 
-          # В реальном сценарии здесь будет интеграция с Coolify
-          # Пример команда для Coolify:
-          # curl -X POST "https://coolify.yourserver.com/api/deploy" \
-          #   -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
-          #   -d '{"project": "task-management", "environment": "staging"}'
+          # Trigger Coolify deployment via webhook
+          RESPONSE=$(curl -X GET "${{ secrets.COOLIFY_WEBHOOK_URL }}" \
+            -w "\n%{http_code}" \
+            -s)
 
-          echo "✅ Deployment triggered: $(date)"
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          echo "Response: $BODY"
+          echo "HTTP Code: $HTTP_CODE"
+
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "✅ Deployment triggered successfully: $(date)"
+          else
+            echo "❌ Deployment trigger failed with code: $HTTP_CODE"
+            exit 1
+          fi
 
       - name: Wait for deployment
         run: |
-          echo "⏳ Waiting for deployment to complete..."
-          sleep 30
+          echo "⏳ Waiting for Coolify deployment to complete..."
+          echo "Monitoring deployment status..."
+          sleep 60
 
       - name: Run health checks
         run: |
           chmod +x .github/scripts/health-monitor.sh
-          APP_URL="${{ vars.STAGING_URL || 'http://localhost:8080' }}" .github/scripts/health-monitor.sh
+          APP_URL="${{ vars.STAGING_URL || 'http://104.248.141.66:8080' }}" .github/scripts/health-monitor.sh
 
       - name: Run predictive rollback monitoring
         run: |
           chmod +x .github/scripts/predictive-rollback.py
           python3 .github/scripts/predictive-rollback.py \
-            "${{ vars.STAGING_URL || 'http://localhost:8080' }}" \
+            "${{ vars.STAGING_URL || 'http://104.248.141.66:8080' }}" \
             "staging-${{ github.sha }}"
 
       - name: Deployment summary
