@@ -152,6 +152,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase repository name
+        id: repo
+        run: echo "name=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -171,7 +175,7 @@ jobs:
           # Only push on main/develop branches, not on PRs
           push: ${{ github.event_name != 'pull_request' }}
           # Use tags only when pushing, otherwise just build (lowercase for Docker compliance)
-          tags: ${{ github.event_name != 'pull_request' && steps.meta.outputs.tags || format('ghcr.io/{0}:pr-{1}', toLower(github.repository), github.event.pull_request.number) }}
+          tags: ${{ github.event_name != 'pull_request' && steps.meta.outputs.tags || format('ghcr.io/{0}:pr-{1}', steps.repo.outputs.name, github.event.pull_request.number) }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
