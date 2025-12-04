@@ -98,7 +98,7 @@ test.describe('Performance and Accessibility', () => {
 
     // Open create task form
     await page.click('button.btn-create');
-    await expect(page.locator('.task-form-modal')).toBeVisible();
+    await expect(page.locator('.task-form-container')).toBeVisible();
 
     // Check that inputs have associated labels or placeholders
     const titleInput = page.locator('input[name="title"]');
@@ -126,7 +126,7 @@ test.describe('Performance and Accessibility', () => {
 
     // Create a task with a very long title
     await page.click('button.btn-create');
-    await expect(page.locator('.task-form-modal')).toBeVisible();
+    await expect(page.locator('.task-form-container')).toBeVisible();
 
     const longTitle = 'A'.repeat(200);
     await page.fill('input[name="title"]', longTitle);
@@ -161,7 +161,7 @@ test.describe('Performance and Accessibility', () => {
 
     // Press Enter to open form
     await page.keyboard.press('Enter');
-    await expect(page.locator('.task-form-modal')).toBeVisible();
+    await expect(page.locator('.task-form-container')).toBeVisible();
   });
 
   test('should persist filters during session', async ({ page }) => {

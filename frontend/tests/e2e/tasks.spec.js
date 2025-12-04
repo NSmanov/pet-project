@@ -56,7 +56,7 @@ test.describe('Task Management System - Main Flows', () => {
     await page.click('button.btn-create');
 
     // Wait for the form modal to appear
-    await expect(page.locator('.task-form-modal')).toBeVisible();
+    await expect(page.locator('.task-form-container')).toBeVisible();
 
     // Fill in the task form
     const uniqueTitle = `Test Task ${Date.now()}`;
@@ -97,7 +97,7 @@ test.describe('Task Management System - Main Flows', () => {
     await editButton.click();
 
     // Wait for the edit form to appear
-    await expect(page.locator('.task-form-modal')).toBeVisible();
+    await expect(page.locator('.task-form-container')).toBeVisible();
 
     // Modify the task
     const updatedTitle = `Updated Task ${Date.now()}`;
@@ -264,7 +264,7 @@ test.describe('Task Management System - Main Flows', () => {
     await page.click('button.btn-create');
 
     // Wait for the form modal to appear
-    await expect(page.locator('.task-form-modal')).toBeVisible();
+    await expect(page.locator('.task-form-container')).toBeVisible();
 
     // Fill in some data
     await page.fill('input[name="title"]', 'Task to Cancel');
@@ -273,7 +273,7 @@ test.describe('Task Management System - Main Flows', () => {
     await page.click('button:has-text("Отмена")');
 
     // Verify the modal is closed
-    await expect(page.locator('.task-form-modal')).not.toBeVisible();
+    await expect(page.locator('.task-form-container')).not.toBeVisible();
   });
 
   test('should validate required fields on task creation', async ({ page }) => {
@@ -281,7 +281,7 @@ test.describe('Task Management System - Main Flows', () => {
     await page.click('button.btn-create');
 
     // Wait for the form modal to appear
-    await expect(page.locator('.task-form-modal')).toBeVisible();
+    await expect(page.locator('.task-form-container')).toBeVisible();
 
     // Try to submit without filling required fields
     await page.click('button[type="submit"]');
