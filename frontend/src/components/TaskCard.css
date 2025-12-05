@@ -1,0 +1,151 @@
+.task-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-left: 4px solid #007bff;
+  animation: slideIn 0.4s ease-out;
+  will-change: transform;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.task-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.task-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.task-title-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.task-code {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #5e6c84;
+  background-color: #f4f5f7;
+  padding: 2px 8px;
+  border-radius: 3px;
+  display: inline-block;
+  width: fit-content;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid #dfe1e6;
+}
+
+.task-title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #212529;
+  flex: 1;
+}
+
+.task-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  transform: scale(1);
+}
+
+.btn-icon:hover {
+  background-color: #f8f9fa;
+  transform: scale(1.1);
+}
+
+.btn-icon:active {
+  transform: scale(0.95);
+}
+
+.btn-delete:hover {
+  background-color: #ffe5e5;
+}
+
+.task-description {
+  color: #6c757d;
+  margin: 12px 0;
+  line-height: 1.5;
+}
+
+.task-meta {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+
+.status-badge,
+.priority-badge {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.status-badge {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.status-todo {
+  background-color: #e7f3ff;
+  color: #0056b3;
+}
+
+.status-in-progress {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-done {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.priority-badge {
+  color: white;
+}
+
+.task-footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task-date {
+  color: #6c757d;
+  font-size: 0.875rem;
+}

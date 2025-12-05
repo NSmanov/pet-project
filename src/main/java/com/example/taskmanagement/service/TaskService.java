@@ -30,4 +30,6 @@ public interface TaskService {
     long getTotalTaskCount();
 
     long getTaskCountByStatus(TaskStatus status);
+
+    List<TaskDto> getTasksByPriority(String priority);
 }

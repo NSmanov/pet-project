@@ -38,7 +38,13 @@ public class TaskServiceImpl implements TaskService {
                 .build();
 
         Task savedTask = taskRepository.save(task);
-        log.info("Task created successfully with id: {}", savedTask.getId());
+
+        // Generate task code after getting ID
+        String taskCode = "TASK-" + savedTask.getId();
+        savedTask.setTaskCode(taskCode);
+        savedTask = taskRepository.save(savedTask);
+
+        log.info("Task created successfully with id: {} and code: {}", savedTask.getId(), taskCode);
 
         return mapToDto(savedTask);
     }
@@ -145,9 +151,28 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.countByStatus(status);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<TaskDto> getTasksByPriority(String priority) {
+        log.info("Fetching tasks with priority: {}", priority);
+
+        com.example.taskmanagement.entity.TaskPriority taskPriority;
+        try {
+            taskPriority = com.example.taskmanagement.entity.TaskPriority.valueOf(priority.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid priority value: " + priority +
+                ". Valid values are: LOW, MEDIUM, HIGH, CRITICAL");
+        }
+
+        return taskRepository.findByPriority(taskPriority).stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
     private TaskDto mapToDto(Task task) {
         return TaskDto.builder()
                 .id(task.getId())
+                .taskCode(task.getTaskCode())
                 .title(task.getTitle())
                 .description(task.getDescription())
                 .status(task.getStatus())
